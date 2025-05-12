@@ -7,7 +7,7 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
-from aml_perceptron import Perceptron, SparsePerceptron, PegasosAlgorithm1
+from aml_perceptron import LogisticRegression, Perceptron, SparsePerceptron, PegasosAlgorithm1
 
 # This function reads the corpus, returns a list of documents, and a list
 # of their corresponding polarity labels. 
@@ -36,7 +36,8 @@ if __name__ == '__main__':
         TfidfVectorizer(),
         SelectKBest(k=1000),
         Normalizer(),
-        PegasosAlgorithm1(n_iter=10, L=1/len(Xtrain))  
+        #LogisticRegression(n_iter=100, L=1/len(Xtrain)*2)  
+        PegasosAlgorithm1(n_iter=100, λ=1/len(Xtrain))
         #Perceptron(n_iter=100)
     )
 

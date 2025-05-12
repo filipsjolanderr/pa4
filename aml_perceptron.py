@@ -113,14 +113,14 @@ class PegasosAlgorithm1(LinearClassifier):
     Implementation of the Pegasos algorithm for linear SVM.
     """
 
-    def __init__(self, n_iter=20, L=0.01):
+    def __init__(self, n_iter=20, λ=0.01):
         """
         The constructor takes:
         n_iter: number of iterations through the dataset
         L: regularization parameter
         """
         self.n_iter = n_iter
-        self.L = L
+        self.λ = λ
 
     def fit(self, X, Y):
         """
@@ -154,34 +154,35 @@ class PegasosAlgorithm1(LinearClassifier):
                 y = Ye[it]  # Use encoded labels
                 
                 t += 1
-                n = 1.0 / (self.L * t)
+                n = 1.0 / (self.λ * t)
                 
                 score = x.dot(self.w)
                 if y * score < 1:
-                    self.w = (1 - n * self.L) * self.w + n * y * x
+                    self.w = (1 - n * self.λ) * self.w + n * y * x
                 else:
-                    self.w = (1 - n * self.L) * self.w
+                    self.w = (1 - n * self.λ) * self.w
                     
         return self
 
-
-class PegasosAlgorithm2(LinearClassifier):
+    
+class LogisticRegression(LinearClassifier):
     """
-    Implementation of the Pegasos algorithm for linear SVM.
+    Implementation of logistic regression using log loss.
+    Uses stochastic gradient descent with L2 regularization.
     """
 
-    def __init__(self, n_iter=20, L=0.01):
+    def __init__(self, n_iter=20, λ=0.01):
         """
         The constructor takes:
         n_iter: number of iterations through the dataset
         L: regularization parameter
         """
         self.n_iter = n_iter
-        self.L = L
+        self.λ = λ
 
     def fit(self, X, Y):
         """
-        Train a linear classifier using the Pegasos algorithm.
+        Train a linear classifier using logistic regression with log loss.
         """
         # First determine which output class will be associated with positive
         # and negative scores, respectively.
@@ -202,7 +203,7 @@ class PegasosAlgorithm2(LinearClassifier):
         # Initialize iteration counter
         t = 0
 
-        # Pegasos algorithm:
+        # Logistic regression with SGD:
         for _ in range(self.n_iter):
             for _ in range(len(X)):
                 # Select a training pair (x, y) uniformly at random
@@ -211,15 +212,22 @@ class PegasosAlgorithm2(LinearClassifier):
                 y = Ye[it]  # Use encoded labels
                 
                 t += 1
-                n = 1.0 / (self.L * t)
+                n = 1.0 / (self.λ * t)  # Learning rate
                 
                 score = x.dot(self.w)
-                if y * score < 1:
-                    self.w = (1 - n * self.L) * self.w + n * y * x
-                else:
-                    self.w = (1 - n * self.L) * self.w
+                
+                # Compute gradient of log loss: -y * x / (1 + exp(y * score))
+                # The gradient of log loss is always non-zero, unlike hinge loss
+                grad = -y * x / (1 + np.exp(y * score))
+                
+                # Update weights with regularization
+                self.w = (1 - n * self.λ) * self.w - n * grad
                     
         return self
+
+
+
+
 ##### The following part is for the optional task.
 
 ### Sparse and dense vectors don't collaborate very well in NumPy/SciPy.
@@ -285,6 +293,3 @@ class SparsePerceptron(LinearClassifier):
                 if y*score <= 0:
                     # (This corresponds to self.w += y*x above.)
                     add_sparse_to_dense(x, self.w, y)
-
-
-
