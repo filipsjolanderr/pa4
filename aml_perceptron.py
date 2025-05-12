@@ -164,6 +164,62 @@ class PegasosAlgorithm1(LinearClassifier):
                     
         return self
 
+
+class PegasosAlgorithm1(LinearClassifier):
+    """
+    Implementation of the Pegasos algorithm for linear SVM.
+    """
+
+    def __init__(self, n_iter=20, L=0.01):
+        """
+        The constructor takes:
+        n_iter: number of iterations through the dataset
+        L: regularization parameter
+        """
+        self.n_iter = n_iter
+        self.L = L
+
+    def fit(self, X, Y):
+        """
+        Train a linear classifier using the Pegasos algorithm.
+        """
+        # First determine which output class will be associated with positive
+        # and negative scores, respectively.
+        self.find_classes(Y)
+
+        # Convert all outputs to +1 (for the positive class) or -1 (negative).
+        Ye = self.encode_outputs(Y)
+
+        # If necessary, convert the sparse matrix returned by a vectorizer
+        # into a normal NumPy matrix.
+        if not isinstance(X, np.ndarray):
+            X = X.toarray()
+
+        # Initialize the weight vector to all zeros.
+        n_features = X.shape[1]
+        self.w = np.zeros(n_features)
+        
+        # Initialize iteration counter
+        t = 0
+
+        # Pegasos algorithm:
+        for _ in range(self.n_iter):
+            for _ in range(len(X)):
+                # Select a training pair (x, y) uniformly at random
+                it = np.random.randint(0, len(X))
+                x = X[it]
+                y = Ye[it]  # Use encoded labels
+                
+                t += 1
+                n = 1.0 / (self.L * t)
+                
+                score = x.dot(self.w)
+                if y * score < 1:
+                    self.w = (1 - n * self.L) * self.w + n * y * x
+                else:
+                    self.w = (1 - n * self.L) * self.w
+                    
+        return self
 ##### The following part is for the optional task.
 
 ### Sparse and dense vectors don't collaborate very well in NumPy/SciPy.
