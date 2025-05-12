@@ -165,7 +165,7 @@ class PegasosAlgorithm1(LinearClassifier):
         return self
 
 
-class PegasosAlgorithm1(LinearClassifier):
+class PegasosAlgorithm2(LinearClassifier):
     """
     Implementation of the Pegasos algorithm for linear SVM.
     """

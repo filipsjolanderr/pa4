@@ -36,8 +36,8 @@ if __name__ == '__main__':
         TfidfVectorizer(),
         SelectKBest(k=1000),
         Normalizer(),
-        #PegasosAlgorithm1(n_iter=10, L=1/len(Xtrain))  
-        Perceptron(n_iter=100)
+        PegasosAlgorithm1(n_iter=10, L=1/len(Xtrain))  
+        #Perceptron(n_iter=100)
     )
 
     # Train the classifier.
